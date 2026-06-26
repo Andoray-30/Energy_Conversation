@@ -27,8 +27,8 @@ extern "C" {
 
 /**
  * 初始化 RS485 驱动
- * 设置 DIR 引脚为接收模式，清空接收缓冲区，启动单字节 IT 接收
- * 注意：本函数不使能 IDLE 中断，需要在每次事务开始时调用 RS485_StartReceive
+ * 设置 DIR 引脚为接收模式，清空接收缓冲区
+ * 不使能 IDLE 中断，不启动接收——需要在每次事务开始时调用 RS485_StartReceive
  */
 void RS485_Init(void);
 
@@ -45,14 +45,21 @@ HAL_StatusTypeDef RS485_Send(const uint8_t *data, uint16_t len);
  * 启动一次 IDLE+IT 接收
  * 清空接收缓冲区，使能 IDLE 中断，启动单字节中断接收
  * 每次发送查询帧后调用此函数开始等待从站响应
+ * @retval  HAL_OK 成功启动，其他值见 HAL_StatusTypeDef
  */
-void RS485_StartReceive(void);
+HAL_StatusTypeDef RS485_StartReceive(void);
 
 /**
  * 查询当前帧是否接收完成
  * @retval  1 帧已完整接收（含溢出截断情况），0 帧仍在接收中
  */
 uint8_t RS485_IsFrameComplete(void);
+
+/**
+ * 查询接收缓冲区是否溢出
+ * @retval  1 溢出（帧数据被截断），0 未溢出
+ */
+uint8_t RS485_IsRxOverflow(void);
 
 /**
  * 取出已接收的完整帧数据

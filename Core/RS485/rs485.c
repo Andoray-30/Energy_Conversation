@@ -54,7 +54,7 @@ static void RS485_SetRxMode(void)
 
 /**
  * 初始化 RS485 模块
- * DIR 默认拉低（接收模式），清空缓冲区，启动单字节中断接收
+ * DIR 默认拉低（接收模式），清空缓冲区
  * 不使能 IDLE 中断——IDLE 仅在 RS485_StartReceive 中按事务周期启用
  */
 void RS485_Init(void)
@@ -62,8 +62,6 @@ void RS485_Init(void)
     RS485_SetRxMode();
 
     UART1_ClearRxBuffer();
-
-    HAL_UART_Receive_IT(&huart1, &uart1_rx_byte, 1);
 }
 
 /**
@@ -71,21 +69,18 @@ void RS485_Init(void)
  * 调用时机：每次发送查询帧后，开始等待从站响应前
  * 流程：确保接收模式 -> 中止上次接收 -> 清空缓冲 -> 使能 IDLE -> 启动 IT
  */
-void RS485_StartReceive(void)
+HAL_StatusTypeDef RS485_StartReceive(void)
 {
     RS485_SetRxMode();
 
-    /* 中止可能正在进行的接收，释放 HAL 状态机 */
-    HAL_UART_AbortReceive_IT(&huart1);
+    HAL_UART_AbortReceive(&huart1);
 
     UART1_ClearRxBuffer();
 
-    /* 清除可能残留的 IDLE 标志，再使能 IDLE 中断 */
     __HAL_UART_CLEAR_IDLEFLAG(&huart1);
     __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
 
-    /* 启动单字节中断接收 */
-    HAL_UART_Receive_IT(&huart1, &uart1_rx_byte, 1);
+    return HAL_UART_Receive_IT(&huart1, &uart1_rx_byte, 1);
 }
 
 /**
@@ -124,6 +119,11 @@ HAL_StatusTypeDef RS485_Send(const uint8_t *data, uint16_t len)
 uint8_t RS485_IsFrameComplete(void)
 {
     return uart1_rx_frame_complete;
+}
+
+uint8_t RS485_IsRxOverflow(void)
+{
+    return uart1_rx_overflow;
 }
 
 /**
