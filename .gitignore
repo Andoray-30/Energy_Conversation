@@ -7,14 +7,14 @@ AGENTS.md
 # 编译输出
 Core/build/
 
-# Object 文件
+# Object 文件和编译产物
 *.o
 *.obj
 *.elf
 *.hex
 *.bin
 *.map
-*.list
+*.lst
 
 # 依赖和缓存
 *.d

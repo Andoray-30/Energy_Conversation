@@ -56,6 +56,8 @@ Core/Src/sysmem.c \
 Core/Src/syscalls.c \
 Core/Src/usart.c \
 RS485/rs485.c \
+Modbus_RTU/modbus_rtu.c \
+JBT_Driver/jbt_driver.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c
 
 # ASM sources
@@ -119,6 +121,8 @@ AS_INCLUDES =
 C_INCLUDES =  \
 -ICore/Inc \
 -IRS485 \
+-IModbus_RTU \
+-IJBT_Driver \
 -IDrivers/STM32F1xx_HAL_Driver/Inc/Legacy \
 -IDrivers/STM32F1xx_HAL_Driver/Inc \
 -IDrivers/CMSIS/Device/ST/STM32F1xx/Include \

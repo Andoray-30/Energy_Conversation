@@ -33,8 +33,8 @@ extern "C" {
 void RS485_Init(void);
 
 /**
- * 发送数据
- * 流程：拉高 DIR -> 阻塞发送 -> 等待 TC -> 拉低 DIR
+ * 阻塞发送一帧数据，发送完成后自动启动接收链路
+ * 流程：DIR=TX → 发送 → 等TC → DIR=RX → 关中断 → 清回环残余 → 启IDLE+IT → 开中断
  * @param data  待发送数据指针
  * @param len   数据长度
  * @retval      HAL_OK 成功，其他值见 HAL_StatusTypeDef
@@ -42,9 +42,9 @@ void RS485_Init(void);
 HAL_StatusTypeDef RS485_Send(const uint8_t *data, uint16_t len);
 
 /**
- * 启动一次 IDLE+IT 接收
- * 清空接收缓冲区，使能 IDLE 中断，启动单字节中断接收
- * 每次发送查询帧后调用此函数开始等待从站响应
+ * 重新启动接收链路
+ * 仅用于初始化阶段或异常恢复后重新挂起接收
+ * 正常事务流程中由 RS485_Send 尾部自动启动，无需再调用此函数
  * @retval  HAL_OK 成功启动，其他值见 HAL_StatusTypeDef
  */
 HAL_StatusTypeDef RS485_StartReceive(void);
